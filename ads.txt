@@ -7,4 +7,4 @@
 # requirement unless this repo is your USER page
 # (itsgoldbaby1234-dot.github.io repo itself). See the note
 # in the chat reply for details.
-google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
+google.com, pub-8441706866727906, DIRECT, f08c47fec0942fa0
