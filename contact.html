@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact — Keep it UP!</title>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<style>
+  body{ font-family: system-ui, sans-serif; max-width:480px; margin:0 auto; padding:32px 20px 60px;
+        background:#0d0e26; color:#f3f1fa; line-height:1.6; }
+  h1{ font-family:'Bungee', system-ui, sans-serif; font-size:26px; margin-bottom:6px; }
+  p.intro{ color:#9b98c2; font-size:14px; margin-top:0; }
+  a{ color:#ffd23f; }
+  label{ display:block; font-size:13px; font-weight:700; margin:18px 0 6px; color:#4cc9f0; }
+  input, textarea{
+    width:100%; padding:11px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.04); color:#f3f1fa; font-family: system-ui, sans-serif;
+    font-size:14px;
+  }
+  input:focus, textarea:focus{ outline:2px solid #4cc9f0; }
+  textarea{ min-height:120px; resize:vertical; }
+  /* honeypot field — invisible to real people, catches simple bots */
+  .hp{ position:absolute; left:-9999px; top:-9999px; }
+  button{
+    margin-top:22px; font-family:'Bungee', system-ui, sans-serif; width:100%;
+    font-size:16px; color:#12132b; border:none; cursor:pointer;
+    padding:14px; border-radius:999px;
+    background: linear-gradient(180deg, #ffd23f, #fb8500);
+    box-shadow: 0 6px 0 #b35400;
+  }
+  button:active{ transform: translateY(4px); box-shadow: 0 2px 0 #b35400; }
+  .links{ margin-top:32px; display:flex; gap:14px; font-size:13px; }
+  .links a{ color:#9b98c2; text-decoration:underline; }
+  .sent-banner{
+    display:none; margin-top:18px; padding:12px 14px; border-radius:10px;
+    background: rgba(76,201,240,0.12); border:1px solid rgba(76,201,240,0.3);
+    color:#4cc9f0; font-size:14px;
+  }
+  .sent-banner.show{ display:block; }
+</style>
+</head>
+<body>
+  <h1>Contact</h1>
+  <p class="intro">Found a bug, have feedback, or just want to say hi? Send a message below.</p>
+
+  <div class="sent-banner" id="sentBanner">✓ Thanks — your message has been sent!</div>
+
+  <form action="https://formsubmit.co/bennerthedoggo1234@gmail.com" method="POST" id="contactForm">
+    <!-- FormSubmit config -->
+    <input type="hidden" name="_subject" value="New message from Keep it UP! contact page">
+    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="_captcha" value="false">
+    <input type="hidden" name="_next" value="https://itsgoldbaby1234-dot.github.io/keep-it-up/contact.html?sent=true">
+    <!-- honeypot: bots tend to fill every field, real users never see this one -->
+    <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off">
+
+    <label for="name">Name</label>
+    <input type="text" id="name" name="Name" required>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="Email" required>
+
+    <label for="message">Message</label>
+    <textarea id="message" name="Message" required></textarea>
+
+    <button type="submit">Send message</button>
+  </form>
+
+  <div class="links">
+    <a href="index.html">&larr; Back to game</a>
+    <a href="about.html">About</a>
+    <a href="privacy-policy.html">Privacy Policy</a>
+  </div>
+
+  <script>
+    // show a friendly "sent" banner if we've just come back from a successful submit
+    if(new URLSearchParams(window.location.search).get('sent') === 'true'){
+      document.getElementById('sentBanner').classList.add('show');
+      document.getElementById('contactForm').reset();
+    }
+  </script>
+</body>
+</html>
