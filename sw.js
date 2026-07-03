@@ -1,9 +1,11 @@
-const CACHE_NAME = 'keep-it-up-v2';
+const CACHE_NAME = 'keep-it-up-v3';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
   './privacy-policy.html',
+  './about.html',
+  './contact.html',
   './icons/icon-72.png',
   './icons/icon-96.png',
   './icons/icon-128.png',
