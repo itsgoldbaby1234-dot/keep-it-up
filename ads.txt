@@ -1,0 +1,10 @@
+# Replace pub-XXXXXXXXXXXXXXXX with your AdSense publisher ID
+# (same one used in data-ad-client, just without "ca-" prefix)
+# This file must live at the ROOT of your domain:
+# https://itsgoldbaby1234-dot.github.io/ads.txt
+# NOTE: GitHub Pages project sites are served under a subpath
+# (/keep-it-up/), so ads.txt here may not satisfy the root
+# requirement unless this repo is your USER page
+# (itsgoldbaby1234-dot.github.io repo itself). See the note
+# in the chat reply for details.
+google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0

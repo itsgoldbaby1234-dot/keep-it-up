@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#12132b">
+<meta name="description" content="Keep the ball up, don't let it hit the spikes! Watch out for rain and wind.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Keep it UP!">
+<title>Keep it UP!</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<!--
+  ============================================================
+  GOOGLE ADSENSE
+  1. Replace ca-pub-XXXXXXXXXXXXXXXX below with your AdSense
+     publisher ID (find it in AdSense > Account > Account info).
+  2. Do the same in the <ins class="adsbygoogle"> tag further
+     down, and set data-ad-slot to your actual ad unit's slot ID
+     (create one in AdSense > Ads > By ad unit > Display ads).
+  3. Ads won't render until your AdSense account is approved
+     and this exact domain is added under AdSense > Sites.
+  4. The ad request is guarded in the script below so it will
+     NOT attempt to load until you replace the placeholder ID —
+     this avoids any layout issues from an unapproved/invalid ad
+     unit while you're still waiting on approval.
+  ============================================================
+-->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+<style>
+  :root{
+    --sky-top: #0d0e26;
+    --sky-mid: #1c1548;
+    --sky-low: #2f1b4e;
+    --ball-hi: #ffd23f;
+    --ball-lo: #fb8500;
+    --spike: #ef233c;
+    --spike-dark: #6a040f;
+    --ink: #f3f1fa;
+    --ink-dim: #9b98c2;
+    --cyan: #4cc9f0;
+    --card: rgba(20, 18, 48, 0.72);
+    --card-border: rgba(255,255,255,0.08);
+    --danger: #ff4757;
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  *{ box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
+  html,body{
+    margin:0; height:100%; width:100%; overflow:hidden;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 55%, var(--sky-low) 100%);
+    color: var(--ink);
+    touch-action: none;
+  }
+  #app{ position:relative; height:100vh; height:100dvh; width:100vw; display:flex; flex-direction:column; }
+
+  /* ---------- shared ---------- */
+  .hidden{ display:none !important; }
+  .title-font{ font-family:'Bungee', system-ui, sans-serif; letter-spacing: 0.5px; }
+
+  /* ---------- start screen ---------- */
+  #startScreen{
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    padding: env(safe-area-inset-top,14px) 20px 24px;
+    overflow-y:auto;
+  }
+  .ad-slot{
+    width:100%; max-width:340px; min-height:50px; margin-top:6px;
+    flex-shrink:0; overflow:hidden;
+  }
+  .ad-slot .adsbygoogle{ display:block; width:100%; }
+  .hero{ text-align:center; margin-top:26px; }
+  .hero h1{
+    font-size: 40px; margin:0; line-height:1;
+    color: var(--ink);
+    text-shadow: 0 0 18px rgba(255,210,63,0.35);
+    position:relative;
+  }
+  .hero h1 .dot-ball{
+    display:inline-block; width:10px; height:10px; border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, var(--ball-hi), var(--ball-lo));
+    vertical-align: 6px; margin-left:2px;
+    animation: bob 1.4s ease-in-out infinite;
+  }
+  @keyframes bob{ 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-8px);} }
+  .hero p{ margin:12px 0 0; color: var(--ink-dim); font-size:14.5px; line-height:1.5; max-width:280px; }
+  .hero p b{ color: var(--danger); font-weight:700; }
+
+  #startBtn{
+    margin-top:26px; font-family:'Bungee', system-ui, sans-serif;
+    font-size:19px; color:#12132b; border:none; cursor:pointer;
+    padding:16px 46px; border-radius:999px;
+    background: linear-gradient(180deg, var(--ball-hi), var(--ball-lo));
+    box-shadow: 0 8px 0 #b35400, 0 14px 24px rgba(251,133,0,0.35);
+    transition: transform .08s ease;
+  }
+  #startBtn:active{ transform: translateY(6px); box-shadow: 0 2px 0 #b35400; }
+
+  #installBtn{
+    margin-top:14px; font-family:'Inter', system-ui, sans-serif; font-weight:700;
+    font-size:13px; color: var(--cyan); background: transparent;
+    border: 1.5px solid rgba(76,201,240,0.4); border-radius:999px;
+    padding:9px 20px; cursor:pointer;
+  }
+  #installBtn:active{ background: rgba(76,201,240,0.1); }
+
+  .leaderboard{
+    margin-top:34px; width:100%; max-width:320px;
+    background: var(--card); border:1px solid var(--card-border);
+    border-radius:16px; padding:16px 18px; backdrop-filter: blur(6px);
+  }
+  .leaderboard h2{
+    font-size:12px; letter-spacing:2px; text-transform:uppercase;
+    margin:0 0 12px; color: var(--cyan); text-align:center;
+  }
+  .lb-row{ display:flex; align-items:center; gap:10px; padding:7px 0; font-size:14px; }
+  .lb-row + .lb-row{ border-top:1px solid rgba(255,255,255,0.06); }
+  .lb-rank{
+    width:22px; height:22px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:800; background: rgba(255,255,255,0.08); color: var(--ink-dim);
+  }
+  .lb-row:nth-child(1) .lb-rank{ background: linear-gradient(180deg, var(--ball-hi), var(--ball-lo)); color:#12132b; }
+  .lb-score{ font-weight:800; flex:1; }
+  .lb-date{ color: var(--ink-dim); font-size:11.5px; }
+  .lb-empty{ text-align:center; color: var(--ink-dim); font-size:13px; padding:4px 0; }
+
+  .footer-links{ margin-top:22px; display:flex; align-items:center; gap:8px; }
+  .footer-links a{ font-size:11.5px; color: var(--ink-dim); text-decoration:underline; }
+
+  /* ---------- game screen ---------- */
+  #gameScreen{ position:relative; flex:1; display:none; }
+  #gameScreen.active{ display:block; }
+  #gameCanvas{ display:block; width:100%; height:100%; touch-action:none; }
+
+  #hud{
+    position:absolute; top: env(safe-area-inset-top,10px); left:0; right:0;
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:12px 16px; pointer-events:none;
+  }
+  .hud-pill{
+    background: var(--card); border:1px solid var(--card-border);
+    border-radius:12px; padding:8px 14px; text-align:center; min-width:74px;
+    backdrop-filter: blur(6px);
+  }
+  .hud-pill .val{ font-family:'Bungee', system-ui, sans-serif; font-size:20px; line-height:1; }
+  .hud-pill .lbl{ font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color: var(--ink-dim); margin-top:3px; }
+
+  #windIndicator{
+    position:absolute; top:70px; left:50%; transform: translateX(-50%);
+    display:flex; align-items:center; gap:6px; font-size:11px; color: var(--ink-dim);
+    opacity:0; transition: opacity .3s; pointer-events:none;
+  }
+  #windIndicator.show{ opacity:1; }
+  #windArrow{ font-size:16px; color: var(--cyan); display:inline-block; }
+
+  #shakeWrap.shake{ animation: shakeAnim .42s ease; }
+  @keyframes shakeAnim{
+    0%{ transform: translate(0,0); }
+    15%{ transform: translate(-10px,4px) rotate(-1deg); }
+    30%{ transform: translate(9px,-5px) rotate(1deg); }
+    45%{ transform: translate(-8px,3px) rotate(-1deg); }
+    60%{ transform: translate(7px,-4px) rotate(1deg); }
+    75%{ transform: translate(-4px,2px); }
+    100%{ transform: translate(0,0); }
+  }
+
+  #gameOverOverlay{
+    position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+    flex-direction:column; background: rgba(8,7,22,0.82); backdrop-filter: blur(3px);
+    text-align:center; padding:20px;
+  }
+  #gameOverOverlay.active{ display:flex; }
+  #gameOverOverlay h2{
+    font-family:'Bungee', system-ui, sans-serif; color: var(--danger); font-size:34px; margin:0;
+    text-shadow: 0 0 20px rgba(255,71,87,0.5);
+  }
+  #gameOverOverlay .finalScore{ margin-top:14px; font-size:16px; color: var(--ink-dim); }
+  #gameOverOverlay .finalScore b{ color: var(--ink); font-size:26px; font-family:'Bungee', system-ui, sans-serif; display:block; margin-top:4px; }
+  #gameOverOverlay .newBest{ margin-top:10px; color: var(--ball-hi); font-size:13px; font-weight:700; letter-spacing:0.5px; }
+  #gameOverOverlay .tap-hint{ margin-top:30px; font-size:13px; color: var(--ink-dim); animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse{ 0%,100%{opacity:.5;} 50%{opacity:1;} }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- START SCREEN -->
+  <div id="startScreen">
+    <div class="ad-slot">
+      <!-- Replace data-ad-client and data-ad-slot with your own values from AdSense -->
+      <ins class="adsbygoogle"
+           style="display:block"
+           data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+           data-ad-slot="0000000000"
+           data-ad-format="auto"
+           data-full-width-responsive="true"></ins>
+    </div>
+    <div class="hero">
+      <h1 class="title-font">Keep it UP!<span class="dot-ball"></span></h1>
+      <p>Keep the ball up, don't let it hit the <b>spikes</b>! Watch out for rain and wind.</p>
+    </div>
+    <button id="startBtn" class="title-font">START</button>
+    <button id="installBtn" class="hidden">⬇ Install app</button>
+    <div class="leaderboard">
+      <h2>Top 3</h2>
+      <div id="lbList"></div>
+    </div>
+    <div class="footer-links">
+      <a href="privacy-policy.html">Privacy Policy</a>
+    </div>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen">
+    <div id="shakeWrap" style="position:absolute; inset:0;">
+      <canvas id="gameCanvas"></canvas>
+      <div id="hud">
+        <div class="hud-pill"><div class="val" id="timerVal">0.0</div><div class="lbl">Time</div></div>
+        <div class="hud-pill"><div class="val" id="bounceVal">0</div><div class="lbl">Bounces</div></div>
+      </div>
+      <div id="windIndicator"><span id="windArrow">→</span><span id="windLabel">Wind</span></div>
+      <div id="gameOverOverlay">
+        <h2 class="title-font">Game Over!</h2>
+        <div class="finalScore">Your score<b id="finalScoreVal">0</b></div>
+        <div class="newBest hidden" id="newBestMsg">★ New top-3 score! ★</div>
+        <div class="tap-hint">tap anywhere to continue</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- Elements ----------
+  const startScreen = document.getElementById('startScreen');
+  const gameScreen = document.getElementById('gameScreen');
+  const startBtn = document.getElementById('startBtn');
+  const canvas = document.getElementById('gameCanvas');
+  const ctx = canvas.getContext('2d');
+  const shakeWrap = document.getElementById('shakeWrap');
+  const timerVal = document.getElementById('timerVal');
+  const bounceVal = document.getElementById('bounceVal');
+  const gameOverOverlay = document.getElementById('gameOverOverlay');
+  const finalScoreVal = document.getElementById('finalScoreVal');
+  const newBestMsg = document.getElementById('newBestMsg');
+  const windIndicator = document.getElementById('windIndicator');
+  const windArrow = document.getElementById('windArrow');
+  const windLabel = document.getElementById('windLabel');
+  const lbList = document.getElementById('lbList');
+
+  // ---------- Leaderboard ----------
+  const LB_KEY = 'keepItUpLeaderboard';
+  function getLeaderboard(){
+    try{ return JSON.parse(localStorage.getItem(LB_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function saveLeaderboard(list){
+    try{ localStorage.setItem(LB_KEY, JSON.stringify(list)); }catch(e){}
+  }
+  function renderLeaderboard(){
+    const list = getLeaderboard();
+    if(!list.length){
+      lbList.innerHTML = '<div class="lb-empty">No scores yet — be the first!</div>';
+      return;
+    }
+    lbList.innerHTML = list.map((e,i)=>`
+      <div class="lb-row">
+        <div class="lb-rank">${i+1}</div>
+        <div class="lb-score">${e.score}</div>
+        <div class="lb-date">${e.date}</div>
+      </div>`).join('');
+  }
+  function submitScore(score){
+    const list = getLeaderboard();
+    const date = new Date().toLocaleDateString(undefined, {month:'short', day:'numeric', year:'numeric'});
+    list.push({score, date});
+    list.sort((a,b)=> b.score - a.score);
+    const top3 = list.slice(0,3);
+    saveLeaderboard(top3);
+    const madeIt = top3.some(e => e.score === score && e.date === date) && score > 0;
+    renderLeaderboard();
+    return madeIt;
+  }
+
+  // ---------- Canvas sizing ----------
+  let W=0, H=0, DPR=1;
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio || 1, 2.5);
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = Math.floor(W*DPR);
+    canvas.height = Math.floor(H*DPR);
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
+  window.addEventListener('resize', ()=>{ if(gameScreen.classList.contains('active')) resize(); });
+
+  // ---------- Game state ----------
+  const SPIKE_H = 46;
+  let ball, gravity, running, bounces, startTime, elapsed;
+  let rainDrops, rainTimer, rainActive;
+  let wind, windTarget, windTimer;
+  let spawnGrace;
+  let animFrame;
+
+  function resetGame(){
+    resize();
+    ball = {
+      x: W/2, y: H*0.28,
+      vx: (Math.random()-0.5)*2,
+      vy: 0,
+      r: Math.max(20, Math.min(30, W*0.07))
+    };
+    gravity = 0.30;
+    running = true;
+    bounces = 0;
+    startTime = performance.now();
+    elapsed = 0;
+    rainActive = false;
+    rainDrops = [];
+    rainTimer = 6 + Math.random()*4; // seconds until first chance of rain
+    wind = 0; windTarget = 0; windTimer = 3 + Math.random()*3;
+    spawnGrace = 0.5; // seconds of immunity right after spawn, guards against sizing race conditions
+    timerVal.textContent = '0.0';
+    bounceVal.textContent = '0';
+    gameOverOverlay.classList.remove('active');
+    windIndicator.classList.remove('show');
+  }
+
+  function pointInBall(px, py){
+    const dx = px-ball.x, dy = py-ball.y;
+    const margin = ball.r * 0.9; // forgiving tap radius
+    return Math.sqrt(dx*dx+dy*dy) <= ball.r + margin;
+  }
+
+  function doBounce(){
+    if(!running) return;
+    bounces++;
+    bounceVal.textContent = bounces;
+    const rainFactor = rainActive ? 0.72 : 1;
+    ball.vy = -(9 + Math.random()*4.5) * rainFactor;
+    ball.vx += (Math.random()-0.5) * 4;
+  }
+
+  function triggerGameOver(){
+    running = false;
+    shakeWrap.classList.add('shake');
+    setTimeout(()=> shakeWrap.classList.remove('shake'), 450);
+    finalScoreVal.textContent = bounces;
+    const isNewBest = submitScore(bounces);
+    newBestMsg.classList.toggle('hidden', !isNewBest);
+    setTimeout(()=> gameOverOverlay.classList.add('active'), 220);
+  }
+
+  function update(dt){
+    if(!running) return;
+    elapsed += dt;
+    timerVal.textContent = elapsed.toFixed(1);
+    if(spawnGrace > 0) spawnGrace -= dt;
+
+    // rain toggling
+    rainTimer -= dt;
+    if(rainTimer <= 0){
+      rainActive = !rainActive || Math.random() < 0.4 ? !rainActive : rainActive;
+      rainTimer = rainActive ? (4 + Math.random()*4) : (5 + Math.random()*5);
+    }
+    if(rainActive && Math.random() < 0.9){
+      for(let i=0;i<2;i++){
+        rainDrops.push({ x: Math.random()*W, y:-10, len: 14+Math.random()*14, spd: 9+Math.random()*6 });
+      }
+    }
+    rainDrops.forEach(d=> d.y += d.spd);
+    rainDrops = rainDrops.filter(d=> d.y < H + 20);
+
+    // wind gusts
+    windTimer -= dt;
+    if(windTimer <= 0){
+      windTarget = (Math.random()-0.5) * 5.5;
+      windTimer = 2.5 + Math.random()*3.5;
+    }
+    wind += (windTarget - wind) * 0.02;
+    if(Math.abs(wind) > 0.4){
+      windIndicator.classList.add('show');
+      // arrow glyph always points right by default; flip it to point left when wind is negative
+      windArrow.style.transform = wind > 0 ? 'none' : 'scaleX(-1)';
+      windLabel.textContent = 'Wind ' + (Math.abs(wind) > 3 ? 'strong' : 'light');
+    } else {
+      windIndicator.classList.remove('show');
+    }
+
+    // physics
+    const g = gravity * (rainActive ? 1.35 : 1);
+    ball.vy += g;
+    ball.vx += wind * 0.04;
+    ball.vx *= 0.995;
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+
+    // walls
+    if(ball.x - ball.r < 0){ ball.x = ball.r; ball.vx *= -0.6; }
+    if(ball.x + ball.r > W){ ball.x = W - ball.r; ball.vx *= -0.6; }
+    if(ball.y - ball.r < 0){ ball.y = ball.r; ball.vy *= -0.4; }
+
+    // spikes collision (immune for a brief moment right after spawn)
+    if(spawnGrace <= 0 && ball.y + ball.r >= H - SPIKE_H){
+      ball.y = H - SPIKE_H - ball.r;
+      triggerGameOver();
+    }
+  }
+
+  function drawSky(){
+    ctx.clearRect(0,0,W,H);
+  }
+
+  function drawSpikes(){
+    const n = Math.ceil(W / 34) + 1;
+    const w = W / (n-1);
+    ctx.beginPath();
+    ctx.moveTo(0, H);
+    for(let i=0;i<n;i++){
+      const x = i*w;
+      ctx.lineTo(x + w/2, H - SPIKE_H);
+      ctx.lineTo(x + w, H);
+    }
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+    const grad = ctx.createLinearGradient(0, H-SPIKE_H, 0, H);
+    grad.addColorStop(0, '#ff4757');
+    grad.addColorStop(1, '#6a040f');
+    ctx.fillStyle = grad;
+    ctx.fill();
+  }
+
+  function drawRain(){
+    if(!rainDrops.length) return;
+    ctx.strokeStyle = 'rgba(180,210,255,0.45)';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    rainDrops.forEach(d=>{
+      ctx.moveTo(d.x, d.y);
+      ctx.lineTo(d.x - wind*1.5, d.y + d.len);
+    });
+    ctx.stroke();
+  }
+
+  function drawBall(){
+    const grad = ctx.createRadialGradient(ball.x-ball.r*0.35, ball.y-ball.r*0.35, ball.r*0.15, ball.x, ball.y, ball.r);
+    grad.addColorStop(0, '#ffe98a');
+    grad.addColorStop(0.5, '#ffd23f');
+    grad.addColorStop(1, '#fb8500');
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+    ctx.fillStyle = grad;
+    ctx.shadowColor = 'rgba(255,183,3,0.5)';
+    ctx.shadowBlur = 18;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  function render(){
+    drawSky();
+    drawRain();
+    drawBall();
+    drawSpikes();
+  }
+
+  let lastT = null;
+  function loop(t){
+    if(lastT === null) lastT = t;
+    const dt = Math.min((t-lastT)/1000, 0.05);
+    lastT = t;
+    update(dt);
+    render();
+    animFrame = requestAnimationFrame(loop);
+  }
+
+  // ---------- Input ----------
+  canvas.addEventListener('pointerdown', (e)=>{
+    if(!running) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left, y = e.clientY - rect.top;
+    if(pointInBall(x,y)) doBounce();
+  });
+
+  gameOverOverlay.addEventListener('pointerdown', ()=>{
+    if(running) return;
+    cancelAnimationFrame(animFrame);
+    gameScreen.classList.remove('active');
+    startScreen.style.display = 'flex';
+  });
+
+  startBtn.addEventListener('click', ()=>{
+    startScreen.style.display = 'none';
+    gameScreen.classList.add('active');
+    // wait two frames so the browser has fully committed the layout change
+    // before we measure the canvas — avoids reading a stale/zero size
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        resetGame();
+        lastT = null;
+        animFrame = requestAnimationFrame(loop);
+      });
+    });
+  });
+
+  // ---------- Init ----------
+  renderLeaderboard();
+
+  // ---------- AdSense: request the ad once the page is ready ----------
+  // Guarded to skip entirely while the placeholder client ID is still in
+  // place, so an unapproved/invalid ad unit can't cause any layout issues.
+  try{
+    const insEl = document.querySelector('.adsbygoogle');
+    const clientId = insEl && insEl.getAttribute('data-ad-client');
+    if(clientId && clientId.indexOf('XXXX') === -1){
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    }
+  }catch(e){}
+
+  // ---------- PWA: service worker registration ----------
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    });
+  }
+
+  // ---------- PWA: install prompt (Android/Chrome) ----------
+  let deferredInstallPrompt = null;
+  const installBtn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', (e)=>{
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    if(installBtn) installBtn.classList.remove('hidden');
+  });
+  if(installBtn){
+    installBtn.addEventListener('click', async ()=>{
+      if(!deferredInstallPrompt) return;
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      installBtn.classList.add('hidden');
+    });
+  }
+  window.addEventListener('appinstalled', ()=>{
+    if(installBtn) installBtn.classList.add('hidden');
+  });
+})();
+</script>
+</body>
+</html>
