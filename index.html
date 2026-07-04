@@ -187,8 +187,6 @@
   #gameOverOverlay .tap-hint{ margin-top:30px; font-size:13px; color: var(--ink-dim); animation: pulse 1.6s ease-in-out infinite; }
   @keyframes pulse{ 0%,100%{opacity:.5;} 50%{opacity:1;} }
 </style>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8441706866727906"
-     crossorigin="anonymous"></script>
 </head>
 <body>
 <div id="app">
@@ -196,7 +194,6 @@
   <!-- START SCREEN -->
   <div id="startScreen">
     <div class="ad-slot">
-      <!-- Replace data-ad-client and data-ad-slot with your own values from AdSense -->
       <ins class="adsbygoogle"
            style="display:block"
            data-ad-client="ca-pub-8441706866727906"
@@ -301,8 +298,12 @@
   // ---------- Canvas sizing ----------
   let W=0, H=0, DPR=1;
   function resize(){
+    const newW = canvas.clientWidth, newH = canvas.clientHeight;
+    // ignore bogus readings (e.g. a stray resize event firing mid-layout,
+    // sometimes triggered by third-party ad iframes) — keep last known-good size
+    if(newW <= 0 || newH <= 0) return;
     DPR = Math.min(window.devicePixelRatio || 1, 2.5);
-    W = canvas.clientWidth; H = canvas.clientHeight;
+    W = newW; H = newH;
     canvas.width = Math.floor(W*DPR);
     canvas.height = Math.floor(H*DPR);
     ctx.setTransform(DPR,0,0,DPR,0,0);
@@ -415,8 +416,9 @@
     if(ball.x + ball.r > W){ ball.x = W - ball.r; ball.vx *= -0.6; }
     if(ball.y - ball.r < 0){ ball.y = ball.r; ball.vy *= -0.4; }
 
-    // spikes collision (immune for a brief moment right after spawn)
-    if(spawnGrace <= 0 && ball.y + ball.r >= H - SPIKE_H){
+    // spikes collision (immune for a brief moment right after spawn;
+    // also requires H to be a sane, non-bogus value before trusting it)
+    if(spawnGrace <= 0 && H > SPIKE_H*2 && ball.y + ball.r >= H - SPIKE_H){
       ball.y = H - SPIKE_H - ball.r;
       triggerGameOver();
     }
