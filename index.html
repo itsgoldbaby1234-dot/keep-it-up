@@ -16,23 +16,6 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-<!--
-  ============================================================
-  GOOGLE ADSENSE
-  1. Replace ca-pub-XXXXXXXXXXXXXXXX below with your AdSense
-     publisher ID (find it in AdSense > Account > Account info).
-  2. Do the same in the <ins class="adsbygoogle"> tag further
-     down, and set data-ad-slot to your actual ad unit's slot ID
-     (create one in AdSense > Ads > By ad unit > Display ads).
-  3. Ads won't render until your AdSense account is approved
-     and this exact domain is added under AdSense > Sites.
-  4. The ad request is guarded in the script below so it will
-     NOT attempt to load until you replace the placeholder ID —
-     this avoids any layout issues from an unapproved/invalid ad
-     unit while you're still waiting on approval.
-  ============================================================
--->
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8441706866727906" crossorigin="anonymous"></script>
 <style>
   :root{
     --sky-top: #0d0e26;
@@ -69,11 +52,6 @@
     padding: env(safe-area-inset-top,14px) 20px 24px;
     overflow-y:auto;
   }
-  .ad-slot{
-    width:100%; max-width:340px; min-height:50px; margin-top:6px;
-    flex-shrink:0; overflow:hidden;
-  }
-  .ad-slot .adsbygoogle{ display:block; width:100%; }
   .hero{ text-align:center; margin-top:26px; }
   .hero h1{
     font-size: 40px; margin:0; line-height:1;
@@ -193,14 +171,6 @@
 
   <!-- START SCREEN -->
   <div id="startScreen">
-    <div class="ad-slot">
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-client="ca-pub-8441706866727906"
-           data-ad-slot="3132190673"
-           data-ad-format="horizontal"
-           data-full-width-responsive="true"></ins>
-    </div>
     <div class="hero">
       <h1 class="title-font">Keep it UP!<span class="dot-ball"></span></h1>
       <p>Keep the ball up, don't let it hit the <b>spikes</b>! Watch out for rain and wind.</p>
@@ -520,17 +490,6 @@
 
   // ---------- Init ----------
   renderLeaderboard();
-
-  // ---------- AdSense: request the ad once the page is ready ----------
-  // Guarded to skip entirely while the placeholder client ID is still in
-  // place, so an unapproved/invalid ad unit can't cause any layout issues.
-  try{
-    const insEl = document.querySelector('.adsbygoogle');
-    const clientId = insEl && insEl.getAttribute('data-ad-client');
-    if(clientId && clientId.indexOf('XXXX') === -1){
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    }
-  }catch(e){}
 
   // ---------- PWA: service worker registration ----------
   if('serviceWorker' in navigator){
